@@ -1,9 +1,9 @@
-from PySide6.QtWidgets import QApplication, QMainWindow, QToolTip
-from PySide6.QtCore import Qt, QRect
-from PySide6.QtGui import QPainter, QColor, QPen
+from PySide6.QtWidgets import QApplication, QMainWindow, QToolTip, QMenu
+from PySide6.QtCore import Qt, QRect, QPoint
+from PySide6.QtGui import QPainter, QColor, QPen, QAction
 
 
-class canvas(QMainWindow):
+class Canvas(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowFlags(Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint)
@@ -12,6 +12,7 @@ class canvas(QMainWindow):
         self.showFullScreen()
         self.startPoint = None
         self.finishPoint = None
+        self.menu = None
 
     def paintEvent(self, event):
         painter = QPainter(self)
@@ -42,23 +43,74 @@ class canvas(QMainWindow):
 
     def mousePressEvent(self, event):
         mousePosition = event.position()
-        self.finishPoint = None
+        self.clear_screen()
         self.startPoint = mousePosition.toPoint()
         self.update()
         print(f'Press Position: x = {mousePosition.x()}, y = {mousePosition.y()}')
 
     def mouseReleaseEvent(self, event):
-        mousePosition = event.position()
+        if self.menu:
+            self.menu.close()
+
+        mousePosition = event.position().toPoint()
+        self.show_popup_menu(mousePosition)
         print(f'Release Position: x = {mousePosition.x()}, y = {mousePosition.y()}')
 
     def keyPressEvent(self, event):
         if event.key() == Qt.Key_Escape or event.key() == Qt.Key_Q:
             self.close()
 
+    def show_popup_menu(self, position: QPoint):
+        if self.menu:
+            self.menu.close()
+
+        copy_image_action = QAction('Copy image', self)
+        save_image_action = QAction('Save', self)
+        capture_text_action = QAction('Capture Text', self)
+        clear_action = QAction('Redo', self)
+        exit_action = QAction('Exit', self)
+
+        copy_image_action.triggered.connect(self.copy_image)
+        save_image_action.triggered.connect(self.save_image)
+        capture_text_action.triggered.connect(self.capture_text)
+        clear_action.triggered.connect(self.clear_screen)
+        exit_action.triggered.connect(self.exit_application)
+        
+        repositionMenu = QPoint(position.x(), position.y() - 120)
+        self.menu = QMenu(self)
+        self.menu.aboutToHide.connect(self.clear_screen)
+        self.menu.addAction(copy_image_action)
+        self.menu.addAction(save_image_action)
+        self.menu.addAction(capture_text_action)
+        self.menu.addAction(clear_action)
+        self.menu.addSeparator()
+        self.menu.addAction(exit_action)
+        self.menu.exec(repositionMenu)
+
+    def copy_image(self):
+        print('Copy Image.')
+        self.exit_application()
+
+    def save_image(self):
+        print('The Screen had been captured.')
+        self.exit_application()
+
+    def capture_text(self):
+        print('The Text had been caputered from screen.')
+        self.exit_application()
+    
+    def clear_screen(self):
+        if self.menu and not self.menu.isHidden():
+            self.menu.close()
+        self.startPoint, self.finishPoint = None, None
+        self.update()
+    
+    def exit_application(self):
+        self.close()
 
 if __name__ == '__main__':
     import sys
 
     app = QApplication(sys.argv)
-    window = canvas()
+    window = Canvas()
     sys.exit(app.exec())
