@@ -1,6 +1,6 @@
 from PySide6.QtWidgets import QApplication, QMainWindow, QToolTip, QMenu
 from PySide6.QtCore import Qt, QRect, QPoint
-from PySide6.QtGui import QPainter, QColor, QPen, QAction
+from PySide6.QtGui import QPainter, QColor, QPen, QAction, QIcon
 
 
 class Canvas(QMainWindow):
@@ -76,7 +76,13 @@ class Canvas(QMainWindow):
         clear_action.triggered.connect(self.clear_screen)
         exit_action.triggered.connect(self.exit_application)
         
-        repositionMenu = QPoint(position.x(), position.y() - 120)
+        copy_image_action.setIcon(QIcon('./icon/copy_image.png'))
+        save_image_action.setIcon(QIcon('./icon/save_image.png'))
+        capture_text_action.setIcon(QIcon('./icon/capture.png'))
+        clear_action.setIcon(QIcon('./icon/redo.png'))
+        exit_action.setIcon(QIcon('./icon/exit.png'))
+        
+        repositionMenu = QPoint(position.x(), position.y() - 130)
         self.menu = QMenu(self)
         self.menu.aboutToHide.connect(self.clear_screen)
         self.menu.addAction(copy_image_action)
