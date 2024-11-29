@@ -4,6 +4,7 @@ import json
 class ConfigManager:
     config_path = Path('./config.json')
 
+
     class WriteConfig:
         def __init__(self, config_path: Path = None) -> None:
             self.config_path = config_path if config_path else ConfigManager.config_path
@@ -61,3 +62,24 @@ class ConfigManager:
                     json.dump(data, out_file)
             except:
                 self.default()
+
+
+    class ReadConfig:
+        def __init__(self, config_path: Path = None):
+            self.config_path = config_path if config_path else ConfigManager.config_path
+
+        def capture(self) -> dict | None:
+            try:
+                with open(self.config_path, 'r') as file:
+                    data = json.load(file)['capture']
+                return data
+            except:
+                ConfigManager.WriteConfig().default()
+        
+        def ocr(self) -> dict | None:
+            try:
+                with open(self.config_path, 'r') as file:
+                    data = json.load(file)['ocr']
+                return data
+            except:
+                ConfigManager.WriteConfig().default()
