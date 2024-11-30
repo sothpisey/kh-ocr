@@ -1,7 +1,7 @@
 from PySide6.QtWidgets import QApplication, QMainWindow, QToolTip, QMenu
 from PySide6.QtCore import Qt, QRect, QPoint
 from PySide6.QtGui import QPainter, QColor, QPen, QAction, QIcon
-
+from helper import ConfigManager, ImageUtility
 
 class Canvas(QMainWindow):
     def __init__(self):
@@ -49,6 +49,11 @@ class Canvas(QMainWindow):
         print(f'Press Position: x = {mousePosition.x()}, y = {mousePosition.y()}')
 
     def mouseReleaseEvent(self, event):
+        ConfigManager.WriteConfig().capture(self.startPoint.x(),
+                                            self.startPoint.y(),
+                                            self.finishPoint.x(),
+                                            self.finishPoint.y()
+                                            )
         if self.menu:
             self.menu.close()
 
@@ -94,8 +99,9 @@ class Canvas(QMainWindow):
         self.menu.exec(repositionMenu)
 
     def copy_image(self):
-        print('Copy Image.')
         self.exit_application()
+        ImageUtility.capture_screen_area(**ConfigManager.ReadConfig().capture())
+        ImageUtility.image_to_clipboard(ConfigManager.ReadConfig().capture()['image_path'])
 
     def save_image(self):
         print('The Screen had been captured.')
