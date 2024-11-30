@@ -1,5 +1,6 @@
 from pathlib import Path
-import json
+import json, io, win32clipboard
+from PIL import Image, ImageGrab
 
 class ConfigManager:
     config_path = Path('./config.json')
@@ -83,3 +84,20 @@ class ConfigManager:
                 return data
             except:
                 ConfigManager.WriteConfig().default()
+
+
+class ImageUtility:
+    def capture_screen_area(left: int, top: int, right: int, bottom: int, image_path: str ="screenshot.png"):
+        screenshot = ImageGrab.grab(bbox=(left, top, right, bottom))
+        screenshot.save(image_path)
+
+    def image_to_clipboard(image_path: str):
+        image = Image.open(Path(image_path))
+        output = io.BytesIO()
+        image.convert("RGB").save(output, "BMP")
+        data = output.getvalue()[14:]
+        output.close()
+        win32clipboard.OpenClipboard()
+        win32clipboard.EmptyClipboard()
+        win32clipboard.SetClipboardData(win32clipboard.CF_DIB, data)
+        win32clipboard.CloseClipboard()
