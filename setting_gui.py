@@ -38,7 +38,7 @@ class SettingWindow(QWidget):
     def check_config_language(self) -> str:
         if ConfigManager.ReadConfig().ocr()['language'] == 'khm':
             return 'Khmer'
-        elif ConfigManager.ReadConfig().ocr()['language'] == 'en':
+        elif ConfigManager.ReadConfig().ocr()['language'] == 'eng':
             return 'English'
 
     def on_cancel_clicked(self) -> None:
@@ -50,7 +50,7 @@ class SettingWindow(QWidget):
         if selected_language == 'Khmer':
             ConfigManager.WriteConfig().ocr(language='khm')
         elif selected_language == 'English':
-            ConfigManager.WriteConfig().ocr(language='en')
+            ConfigManager.WriteConfig().ocr(language='eng')
 
         QMessageBox.information(self, ' ', f'You changed to  {selected_language} language')
 
