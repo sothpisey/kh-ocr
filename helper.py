@@ -119,5 +119,5 @@ class ImageUtility:
 def text_to_clipboard(text: str = 'Found nothing..!') -> None:
     win32clipboard.OpenClipboard()
     win32clipboard.EmptyClipboard()
-    win32clipboard.SetClipboardText(text)
+    win32clipboard.SetClipboardText(text, win32clipboard.CF_UNICODETEXT)
     win32clipboard.CloseClipboard()

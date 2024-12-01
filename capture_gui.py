@@ -108,8 +108,9 @@ class CaptureWindow(QMainWindow):
         self.exit_application()
 
     def capture_text(self):
-        print('The Text had been caputered from screen.')
         self.exit_application()
+        ImageUtility.capture_screen_area(**ConfigManager.ReadConfig().capture())
+        ImageUtility.image_to_text_clipboard()
     
     def clear_screen(self):
         if self.menu and not self.menu.isHidden():
