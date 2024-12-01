@@ -1,5 +1,5 @@
 from pathlib import Path
-import json, io, win32clipboard
+import json, io, win32clipboard, pytesseract
 from PIL import Image, ImageGrab
 
 class ConfigManager:
@@ -66,7 +66,7 @@ class ConfigManager:
 
 
     class ReadConfig:
-        def __init__(self, config_path: Path = None):
+        def __init__(self, config_path: Path = None) -> None:
             self.config_path = config_path if config_path else ConfigManager.config_path
 
         def capture(self) -> dict | None:
@@ -87,11 +87,11 @@ class ConfigManager:
 
 
 class ImageUtility:
-    def capture_screen_area(left: int, top: int, right: int, bottom: int, image_path: str ="screenshot.png"):
+    def capture_screen_area(left: int, top: int, right: int, bottom: int, image_path: str ="screenshot.png") -> None:
         screenshot = ImageGrab.grab(bbox=(left, top, right, bottom))
         screenshot.save(image_path)
 
-    def image_to_clipboard(image_path: str):
+    def image_to_clipboard(image_path: str) -> None:
         image = Image.open(Path(image_path))
         output = io.BytesIO()
         image.convert("RGB").save(output, "BMP")
@@ -101,3 +101,23 @@ class ImageUtility:
         win32clipboard.EmptyClipboard()
         win32clipboard.SetClipboardData(win32clipboard.CF_DIB, data)
         win32clipboard.CloseClipboard()
+
+    def image_to_text() -> str:
+        config_data = ConfigManager.ReadConfig().ocr()
+
+        pytesseract.pytesseract.tesseract_cmd = config_data['tesseract_path']
+        image_path = './capture.png'
+        image = Image.open(image_path)
+
+        return pytesseract.image_to_string(image, lang=config_data['language'])
+    
+    def image_to_text_clipboard() -> None:
+        text_to_clipboard(ImageUtility.image_to_text())
+
+
+# The functions with no group
+def text_to_clipboard(text: str = 'Found nothing..!') -> None:
+    win32clipboard.OpenClipboard()
+    win32clipboard.EmptyClipboard()
+    win32clipboard.SetClipboardText(text)
+    win32clipboard.CloseClipboard()
