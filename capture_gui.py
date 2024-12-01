@@ -3,13 +3,13 @@ from PySide6.QtCore import Qt, QRect, QPoint
 from PySide6.QtGui import QPainter, QColor, QPen, QAction, QIcon
 from helper import ConfigManager, ImageUtility
 
-class Canvas(QMainWindow):
+class CaptureWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowFlags(Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint)
         self.setAttribute(Qt.WA_TranslucentBackground)
         self.setWindowOpacity(1)
-        self.showFullScreen()
+        #self.showFullScreen()
         self.startPoint = None
         self.finishPoint = None
         self.menu = None
@@ -124,5 +124,6 @@ if __name__ == '__main__':
     import sys
 
     app = QApplication(sys.argv)
-    window = Canvas()
+    window = CaptureWindow()
+    window.showFullScreen()
     sys.exit(app.exec())
