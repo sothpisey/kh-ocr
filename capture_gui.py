@@ -1,4 +1,4 @@
-from PySide6.QtWidgets import QApplication, QMainWindow, QToolTip, QMenu
+from PySide6.QtWidgets import QApplication, QMainWindow, QToolTip, QMenu, QFileDialog
 from PySide6.QtCore import Qt, QRect, QPoint
 from PySide6.QtGui import QPainter, QColor, QPen, QAction, QIcon
 from helper import ConfigManager, ImageUtility
@@ -104,8 +104,15 @@ class CaptureWindow(QMainWindow):
         ImageUtility.image_to_clipboard(ConfigManager.ReadConfig().capture()['image_path'])
 
     def save_image(self):
-        print('The Screen had been captured.')
-        self.exit_application()
+        self.showMinimized()
+        ImageUtility.capture_screen_area(**ConfigManager.ReadConfig().capture())
+        file_name, _ = QFileDialog.getSaveFileName(self, 'Save', 'image.png', 'Image (*.png)')
+        if file_name:
+            print(f'File will be saved to: {file_name}')
+            with open('./capture.png', 'rb') as file:
+                image_data = file.read()
+                with open(file_name, 'wb') as out_file:
+                    out_file.write(image_data)
 
     def capture_text(self):
         self.exit_application()
