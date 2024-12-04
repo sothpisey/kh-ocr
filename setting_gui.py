@@ -1,10 +1,12 @@
 import sys
 from PySide6.QtWidgets import QApplication, QLabel, QComboBox, QVBoxLayout, QHBoxLayout, QPushButton, QWidget, QFormLayout, QMessageBox
 from PySide6.QtGui import QIcon
-from PySide6.QtCore import Qt
+from PySide6.QtCore import Qt, Signal
 from helper import ConfigManager
 
 class SettingWindow(QWidget):
+    applied = Signal(str)
+
     def __init__(self):
         super().__init__()
         self.setWindowTitle('Settings')
@@ -53,6 +55,7 @@ class SettingWindow(QWidget):
             ConfigManager.WriteConfig().ocr(language='eng')
 
         QMessageBox.information(self, ' ', f'You changed to  {selected_language} language')
+        self.applied.emit(selected_language)
 
 
 if __name__ == '__main__':

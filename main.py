@@ -1,10 +1,10 @@
 import sys
 from PySide6.QtGui import QIcon, QAction
-from PySide6.QtWidgets import QApplication, QSystemTrayIcon, QMenu
+from PySide6.QtWidgets import QApplication, QSystemTrayIcon, QMenu, QLabel, QWidgetAction, QWidget
 from PySide6.QtCore import QPoint
 from setting_gui import SettingWindow
 from capture_gui import CaptureWindow
-
+from helper import ConfigManager
 
 
 class SystemTray:
@@ -14,10 +14,12 @@ class SystemTray:
         self.menu = QMenu()
         self.setting_window = SettingWindow()
         self.capture_window = CaptureWindow()
+        self.language_label_action = None
 
         self._setup_tray()
         self._setup_actions()
         self._setup_menu()
+        self._connect_signals()
 
     def _setup_tray(self):
         self.tray.setIcon(QIcon('./icon/app_icon.png'))
@@ -39,10 +41,14 @@ class SystemTray:
         self.quit_action.triggered.connect(self.app.quit)
 
     def _setup_menu(self):
+        self.language_label_action = self._add_label_to_menu(self.menu, SettingWindow().check_config_language())
         self.menu.addAction(self.setting_action)
         self.menu.addAction(self.capture_action)
         self.menu.addSeparator()
         self.menu.addAction(self.quit_action)
+
+    def _connect_signals(self):
+        self.setting_window.applied.connect(self._update_label)
 
     def _toggle_setting_window(self):
         if self.setting_window:
@@ -61,6 +67,22 @@ class SystemTray:
     def _on_tray_activated(self, reason):
         if reason == QSystemTrayIcon.Context:
             self.menu.exec(self.tray.geometry().bottomLeft() + QPoint(-120, -86))
+
+    def _add_label_to_menu(self, menu, label_text):
+        label = QLabel(label_text)
+        label.setStyleSheet('padding: 4px; color: White; font-weight: bold;')
+
+        label_action = QWidgetAction(menu)
+        label_action.setDefaultWidget(label)
+        menu.addAction(label_action)
+        return label_action
+
+    def _update_label(self, selected_language):
+        new_language = selected_language
+        if self.language_label_action:
+            label_widget = self.language_label_action.defaultWidget()
+            if isinstance(label_widget, QLabel):
+                label_widget.setText(new_language)
 
 
 if __name__ == '__main__':
